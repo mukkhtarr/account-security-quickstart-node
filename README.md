@@ -19,8 +19,6 @@ Implementations in other languages:
 | :--- | :--- | :----- | :-- | :--- |
 | TBD | [Done](https://github.com/TwilioDevEd/account-security-quickstart-spring)  | [Done](https://github.com/TwilioDevEd/account-security-quickstart-django)  | [Done](https://github.com/TwilioDevEd/account-security-quickstart-php) | [Done](https://github.com/TwilioDevEd/account-security-quickstart-rails)  |
 
-This app uses [MongoDB](https://www.mongodb.com/) as a data store. You will have to install MongoDB as well and make sure it is running.
-
 ## Features
 
 #### Authy Two-Factor Authentication Demo
