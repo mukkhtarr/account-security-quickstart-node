@@ -1,4 +1,4 @@
-var request = require('request');
+var axios = require('axios');
 var VERSION = "0.1";
 
 
@@ -69,35 +69,37 @@ PhoneVerification.prototype._request = function (type, path, params, callback, q
 
     options = {
         url: this.apiURL + path,
-        form: params,
+        parms: params,
         headers: this.headers,
-        qs: qs,
-        json: true,
-        jar: false,
-        strictSSL: true
+        qs: qs
     };
 
     console.log(options.url);
 
-    var callback_check = function (err, res, body) {
-        if (!err) {
-            if (res.statusCode === 200) {
-                callback(null, body);
-            } else {
-                callback(body);
-            }
-        } else {
-            callback(err);
+    var callback_check = function (response) {
+        if (response.status === 200) {
+            return callback(null, response.data);
         }
-    };
+        throw response;
+    }; 
 
     switch (type) {
         case "post":
-            request.post(options, callback_check);
+            axios
+                .post(options.url, params, options)
+                .then(callback_check)
+                .catch(function(err) {
+                    callback(err.data || err)
+                });
             break;
 
         case "get":
-            request.get(options, callback_check);
+            axios
+                .get(options.url, options)
+                .then(callback_check)
+                .catch(function (err) {
+                    callback(err.data || err);
+                });
             break;
     }
 };

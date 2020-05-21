@@ -1,4 +1,4 @@
-require('dotenv').load();
+require('dotenv-safe').config();
 require('./server/model/user_model.js');
 
 var express = require('express');
@@ -22,7 +22,9 @@ if(!config.API_KEY){
 /**
  * Setup MongoDB connection.
  */
-mongoose.connect('mongodb://localhost:27017/accountsecuritydemo');
+mongoose.set('useUnifiedTopology', true);
+mongoose.set('useCreateIndex', true);
+mongoose.connect(process.env.MONGO_CONNECTION, { useNewUrlParser: true });
 var db = mongoose.connection;
 
 app.use(cookieParser());
@@ -54,7 +56,8 @@ db.once('open', function (err) {
         cookie: {maxAge: 60 * 60 * 1000},
         store: new mongoStore({
             db: mongoose.connection.db,
-            collection: 'sessions'
+            collection: 'sessions',
+            url: process.env.MONGO_CONNECTION
         }),
         resave: true,
         saveUninitialized: true
@@ -172,3 +175,5 @@ app.all('/2fa/*', requireLogin, function (req, res, next) {
  */
 app.use('/api', router);
 app.use('/', express.static(__dirname + '/public'));
+
+module.exports = app;

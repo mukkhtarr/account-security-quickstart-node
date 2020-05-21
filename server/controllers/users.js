@@ -3,7 +3,7 @@ var mongoose = require('mongoose');
 var User = mongoose.model('User');
 var config = require('../config.js');
 var qs = require('qs');
-var request = require('request');
+var axios = require('axios');
 var phoneReg = require('../lib/phone_verification')(config.API_KEY);
 
 // https://github.com/seegno/authy-client
@@ -334,29 +334,28 @@ exports.checkonetouchstatus = function (req, res) {
 
     var options = {
         url: "https://api.authy.com/onetouch/json/approval_requests/" + req.session.uuid,
-        form: {
+        params: {
             "api_key": config.API_KEY
         },
         headers: {},
         qs: {
             "api_key": config.API_KEY
-        },
-        json: true,
-        jar: false,
-        strictSSL: true
+        }
     };
 
-    request.get(options, function (err, response) {
-        if (err) {
+    axios(options)
+        .then(function (response) {
+            console.log("OneTouch Status Response: ", response.data);
+            process.stdout.write(response.data);
+            if (response.data.approval_request.status === "approved") {
+                req.session.authy = true;
+            }
+            res.status(200).json(response.data);
+        })
+        .catch(function (err) {
             console.log("OneTouch Status Request Error: ", err);
             res.status(500).json(err);
-        }
-        console.log("OneTouch Status Response: ", response);
-        if (response.body.approval_request.status === "approved") {
-            req.session.authy = true;
-        }
-        res.status(200).json(response);
-    });
+        });
 };
 
 /**
