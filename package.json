@@ -36,7 +36,8 @@
     "mongodb": "^3.5.5",
     "mongoose": "^5.9.6",
     "nodemon": "^2.0.2",
-    "qs": "^6.9.2"
+    "qs": "^6.9.2",
+    "twilio": "^3.43.1"
   },
   "devDependencies": {
     "chai": "^4.2.0",

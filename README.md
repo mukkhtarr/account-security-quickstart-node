@@ -45,6 +45,9 @@ Before we begin, we need to collect all the config values we need to run the app
 
 | Config Value | Description |
 | :----------  | :---------- |
+| TWILIO_ACCOUNT_SID        | Find in the Twilio [console](https://www.twilio.com/console/)|
+| TWILIO_AUTH_TOKEN         | [console](https://www.twilio.com/console/)|
+| VERIFY_SERVICE_SID        | Create a Verify Service in the [console](https://www.twilio.com/console/verify/services)|
 | ACCOUNT_SECURITY_API_KEY  | Create a new Authy application in the [console](https://www.twilio.com/console/authy/). After you give it a name you can view the generated Account Security production API key. This is the string you will later need to set up in your environmental variables.|
 
 ![Get Authy API Key](api_key.png)

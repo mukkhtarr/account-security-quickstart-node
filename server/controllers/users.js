@@ -4,11 +4,12 @@ var User = mongoose.model('User');
 var config = require('../config.js');
 var qs = require('qs');
 var axios = require('axios');
-var phoneReg = require('../lib/phone_verification')(config.API_KEY);
 
 // https://github.com/seegno/authy-client
 const Client = require('authy-client').Client;
 const authy = new Client({key: config.API_KEY});
+
+const twilio = require('twilio')(config.ACCOUNT_SID, config.AUTH_TOKEN);
 
 
 function hashPW(pwd) {
@@ -365,22 +366,26 @@ exports.checkonetouchstatus = function (req, res) {
  * @param res
  */
 exports.requestPhoneVerification = function (req, res) {
-    var phone_number = req.body.phone_number;
-    var country_code = req.body.country_code;
+    var phoneNumber = req.body.phoneNumber;
     var via = req.body.via;
 
     console.log("body: ", req.body);
 
-    if (phone_number && country_code && via) {
-        phoneReg.requestPhoneVerification(phone_number, country_code, via, function (err, response) {
-            if (err) {
-                console.log('error creating phone reg request', err);
-                res.status(500).json(err);
-            } else {
-                console.log('Success register phone API call: ', response);
+    if (phoneNumber && via) {
+        twilio.verify.services(config.VERIFY_SERVICE)
+            .verifications
+            .create({
+                to: phoneNumber,
+                channel: via
+            })
+            .then(response => {
+                console.log('Successfully sent verification', response.sid);
                 res.status(200).json(response);
-            }
-        });
+            })
+            .catch(err => {
+                console.log('Error creating phone reg request', err);
+                res.status(500).json(err);
+            });
     } else {
         console.log('Failed in Register Phone API Call', req.body);
         res.status(500).json({error: "Missing fields"});
@@ -395,24 +400,29 @@ exports.requestPhoneVerification = function (req, res) {
  * @param res
  */
 exports.verifyPhoneToken = function (req, res) {
-    var country_code = req.body.country_code;
-    var phone_number = req.body.phone_number;
+    var phoneNumber = req.body.phoneNumber;
     var token = req.body.token;
     
-    if (phone_number && country_code && token) {
-        phoneReg.verifyPhoneToken(phone_number, country_code, token, function (err, response) {
-            if (err) {
-                console.log('error creating phone reg request', err);
-                res.status(500).json(err);
-            } else {
-                console.log('Confirm phone success confirming code: ', response);
-                if (response.success) {
+    if (phoneNumber && token) {
+        twilio.verify.services(config.VERIFY_SERVICE)
+            .verificationChecks
+            .create({
+                to: phoneNumber,
+                code: token
+            })
+            .then(check => {
+                console.log('Confirming code: ', check);
+                if (check.status === "approved") {
                     req.session.ph_verified = true;
+                } else {
+                    res.status(401).json("Wrong code");
                 }
-                res.status(200).json(err);
-            }
-
-        });
+                res.status(200).json(check);
+            })
+            .catch(err => {
+                console.log('Error creating phone reg request', err);
+                res.status(500).json(err);
+            })
     } else {
         console.log('Failed in Confirm Phone request body: ', req.body);
         res.status(500).json({error: "Missing fields"});
