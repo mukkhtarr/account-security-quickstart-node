@@ -9,7 +9,7 @@ var axios = require('axios');
 const Client = require('authy-client').Client;
 const authy = new Client({key: config.API_KEY});
 
-const twilio = require('twilio')(config.ACCOUNT_SID, config.AUTH_TOKEN);
+const twilioClient = require('../lib/twilioClient');
 
 
 function hashPW(pwd) {
@@ -372,19 +372,14 @@ exports.requestPhoneVerification = function (req, res) {
     console.log("body: ", req.body);
 
     if (phoneNumber && via) {
-        twilio.verify.services(config.VERIFY_SERVICE)
-            .verifications
-            .create({
-                to: phoneNumber,
-                channel: via
-            })
-            .then(response => {
-                console.log('Successfully sent verification', response.sid);
+        twilioClient.verifications(phoneNumber, via)
+            .then((response) => {
+                console.log(`Successfully sent verification, ${response.sid}`);
                 res.status(200).json(response);
             })
-            .catch(err => {
-                console.log('Error creating phone reg request', err);
-                res.status(500).json(err);
+            .catch((error) => {
+                console.log(`Error creating phone reg request, ${error}`);
+                res.status(500).json(error);
             });
     } else {
         console.log('Failed in Register Phone API Call', req.body);
@@ -404,23 +399,20 @@ exports.verifyPhoneToken = function (req, res) {
     var token = req.body.token;
     
     if (phoneNumber && token) {
-        twilio.verify.services(config.VERIFY_SERVICE)
-            .verificationChecks
-            .create({
-                to: phoneNumber,
-                code: token
-            })
+        twilioClient.verificationChecks(phoneNumber, token)
             .then(check => {
-                console.log('Confirming code: ', check);
+                console.log(`Confirming code: , ${check}`);
+                let status = 200;
                 if (check.status === "approved") {
                     req.session.ph_verified = true;
-                } else {
+                }else{
                     res.status(401).json("Wrong code");
+                    return;
                 }
                 res.status(200).json(check);
             })
             .catch(err => {
-                console.log('Error creating phone reg request', err);
+                console.log(`Error creating phone reg request, ${err}`);
                 res.status(500).json(err);
             })
     } else {

@@ -28,6 +28,9 @@ jobs:
     - run: npm test
       env:
         CI: true
-        ACCOUNT_SECURITY_API_KEY: 'YOUR-API-KEY'
+        ACCOUNT_SECURITY_API_KEY: 'SECURITY_API_KEY'
         PORT: 3000
         MONGO_CONNECTION: 'mongodb://127.0.0.1:27017/accountsecuritytesting'
+        TWILIO_ACCOUNT_SID: 'TWILIO_ACCOUNT_SID'
+        TWILIO_AUTH_TOKEN: 'TWILIO_AUTH_TOKEN'
+        VERIFY_SERVICE_SID: 'VERIFY_SERVICE_SID'
