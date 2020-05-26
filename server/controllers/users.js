@@ -11,7 +11,6 @@ const authy = new Client({key: config.API_KEY});
 
 const twilioClient = require('../lib/twilioClient');
 
-
 function hashPW(pwd) {
     return crypto.createHash('sha256').update(pwd).digest('base64').toString();
 }
