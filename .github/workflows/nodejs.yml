@@ -5,9 +5,9 @@ name: Node.js
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, next ]
   pull_request:
-    branches: [ master ]
+    branches: [ master, next ]
 
 jobs:
   build:
@@ -28,6 +28,9 @@ jobs:
     - run: npm test
       env:
         CI: true
-        ACCOUNT_SECURITY_API_KEY: 'YOUR-API-KEY'
+        ACCOUNT_SECURITY_API_KEY: 'SECURITY_API_KEY'
         PORT: 3000
         MONGO_CONNECTION: 'mongodb://127.0.0.1:27017/accountsecuritytesting'
+        TWILIO_ACCOUNT_SID: 'ACXXXXXXXXXXXXXXXXXXXX'
+        TWILIO_AUTH_TOKEN: 'XXXXXXXXXXXXXXXXXXXXXX'
+        VERIFY_SERVICE_SID: 'VAXXXXXXXXXXXXXXXXXXXX'
