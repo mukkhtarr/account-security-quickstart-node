@@ -81,7 +81,7 @@ exports.register = function (req, res) {
     var username = req.body.username;
     User.findOne({username: username}).exec(function (err, user) {
         if (err) {
-            console.log('Rregistration Error', err);
+            console.log('Registration Error', err);
             res.status(500).json(err);
             return;
         }
