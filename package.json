@@ -4,7 +4,7 @@
   "description": "Simple demo showing how Twilio Account Security works.",
   "main": "index.js",
   "scripts": {
-    "test": "export NODE_ENV=test && jest --detectOpenHandles --forceExit",
+    "test": "jest --detectOpenHandles --forceExit",
     "start": "nodemon ."
   },
   "repository": {
